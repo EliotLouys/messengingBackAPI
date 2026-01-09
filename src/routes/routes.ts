@@ -12,6 +12,8 @@ import {
   getChannels,
   sendMessage,
   joinChannel,
+  deleteChannel,
+  leaveChannel,
 } from "../controllers/chatController";
 import { getMetadata, postUserMetadata } from "../controllers/userController";
 const router = Router();
@@ -30,13 +32,14 @@ protectedRouter.use(authMiddleware);
 protectedRouter.post("/extends", extendSession);
 
 // Channels Routes
-protectedRouter.post("/channels", createChannel); // Create a room
-protectedRouter.get("/channels", getChannels); // List rooms
-protectedRouter.post("/channels/:channelId/join", joinChannel);
-
+protectedRouter.post("/channel", createChannel); // Create a channel
+protectedRouter.get("/user/channel", getChannels); // List channels
+protectedRouter.delete("/channel/:channelId", deleteChannel); //Deletes a channel
+protectedRouter.put("/channel/:channel_id/user/:user_id", joinChannel); // Join a room
+protectedRouter.delete("/channel/:channel_id/user/:user_id", leaveChannel); // Leave a room
 // Messages Routes
 protectedRouter.post("/messages", sendMessage); // Post a message
-protectedRouter.get("/channels/:channelId/messages", getChannelMessages); // Read chat history
+protectedRouter.get("/channel/:channelId/messages", getChannelMessages); // Read chat history
 
 // User Routes
 protectedRouter.get("user/meta", getMetadata);

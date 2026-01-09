@@ -9,28 +9,57 @@ export const createChannel = (req: Request, res: Response) => {
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Creates new channel"
      #swagger.parameters["body"]={
-     in:"body",
-     description:"Channel metadata",
-     schema:{
-      name:"Channel_name_here",
-      description:"Channel_description_here"
-     }}
+      in:"body",
+      description:"Channel metadata",
+      schema:{
+        name:"Channel_name_here",
+        description:"Channel_description_here"
+      }
+     }
   */
 
   const { name, description } = req.body;
-  const userId = (req as any).user.id; // Get the creator's ID
+  const username = (req as any).user.username; // Get the creator's username
 
   try {
     // 1. Create the channel
-    const channel = ChannelRepo.createChannel(name, description || "");
+    const creatorId = (req as any).user.id;
+    const channel = ChannelRepo.createChannel(
+      name,
+      description || "",
+      creatorId
+    );
 
     // 2. Automatically add the creator as a member
-    MemberRepo.addMember(userId, channel.id);
+    MemberRepo.addMember(username, channel.id);
 
     res.status(201).json(channel);
   } catch (err: any) {
     if (err.message === "CHANNEL_EXISTS")
       return res.status(409).json({ error: "Channel name taken" });
+    res
+      .status(500)
+      .json({ error: "Internal error", errorMessage: err.message });
+  }
+};
+
+export const deleteChannel = (req: Request, res: Response) => {
+  /* #swagger.tags = ['Channel']
+     #swagger.security = [{ "bearerAuth": [] }] 
+     #swagger.description = "Delete a channel by ID"
+  */
+  try {
+    const channelId = parseInt(req.params.channelId);
+    const userId = (req as any).user.id;
+    const success = ChannelRepo.deleteChannel(channelId, userId);
+    if (success) {
+      res.json({ message: "Channel deleted successfully" });
+    } else {
+      res
+        .status(401)
+        .json({ error: "Channel not found or unauthorized to perform" });
+    }
+  } catch (err: any) {
     res
       .status(500)
       .json({ error: "Internal error", errorMessage: err.message });
@@ -107,21 +136,56 @@ export const joinChannel = (req: Request, res: Response) => {
   /* #swagger.tags = ['Channel']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Join the specified channel"
-     #swagger.parameters["body"]={
-      in:"body",
-      description:"Message metadata",
-      schema:{
-        channelId:"Channel_ID_Where_to_send"
+     #swagger.parameters['user_id'] = {
+        in: 'path',
+        description: 'The unique ID of the user',
+        required: true,
+        type: 'string'
+     }
+     #swagger.parameters['channel_id'] = {
+        in: 'path',
+        description: 'The unique ID of the channel to join', 
+        required: true,
+        type: 'string'
       }
-    }
   */
-  const channelId = parseInt(req.params.channelId);
-  const userId = (req as any).user.id;
+  const channelId = parseInt(req.params.channel_id);
 
-  const success = MemberRepo.addMember(userId, channelId);
+  const username = req.params.user_id;
+  const requestSenderId = (req as any).user.id;
+
+  const success = MemberRepo.addMember(username, channelId, requestSenderId);
   if (success) {
     res.json({ message: "Joined channel successfully" });
   } else {
     res.status(400).json({ message: "Already a member or invalid channel" });
+  }
+};
+
+export const leaveChannel = (req: Request, res: Response) => {
+  /* #swagger.tags = ['Channel']
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.description = "Leave the specified channel"
+     #swagger.parameters['user_id'] = {
+        in: 'path',
+        description: 'The unique ID of the user',
+        required: true,
+        type: 'string'
+     }
+     #swagger.parameters['channel_id'] = {
+        in: 'path',
+        description: 'The unique ID of the channel to join', 
+        required: true,
+        type: 'string'
+      }
+  */
+  const channelId = parseInt(req.params.channel_id);
+  const targetUsername = req.params.user_id;
+  const userId = (req as any).user.id;
+  const success = MemberRepo.removeMember(targetUsername, channelId, userId);
+  if (success) {
+    res.json({ message: "Left channel successfully" });
+  } else {
+    res.status(400).json({ message: "Not a member or invalid channel" });
   }
 };

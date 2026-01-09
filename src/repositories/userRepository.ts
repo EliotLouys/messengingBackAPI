@@ -28,6 +28,7 @@ export const createUser = async (username: string, plainPassword: string) => {
     throw error;
   }
 };
+
 // --- GET Metadata ---
 export const findUserMetaData = (userId: number): UserMetaData | undefined => {
   const query = `

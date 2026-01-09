@@ -23,6 +23,7 @@ export const initDb = () => {
             name TEXT UNIQUE NOT NULL,
             description TEXT,
             type TEXT DEFAULT 'text' -- 'text' or 'voice'
+            creator_id INTEGER,
         )
     `
   ).run();

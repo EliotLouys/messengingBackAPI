@@ -1,9 +1,13 @@
 import db from "../db";
 
-export const createChannel = (name: string, description: string) => {
+export const createChannel = (
+  name: string,
+  description: string,
+  creatorId: number
+) => {
   try {
     const stmt = db.prepare(
-      "INSERT INTO channels (name, description) VALUES (?, ?)"
+      "INSERT INTO channels (name, description, creator_id) VALUES (?, ?, ?)"
     );
     const result = stmt.run(name, description);
     return { id: result.lastInsertRowid, name, description };
@@ -28,4 +32,18 @@ export const getChannelsByUser = (userId: number) => {
     `
     )
     .all(userId);
+};
+
+export const deleteChannel = (channelId: number, userId: number) => {
+  const isAllowed =
+    userId ===
+    db.prepare("SELECT creator_id FROM channels WHERE id = ?").get(channelId)
+      ?.creator_id;
+  if (!isAllowed) {
+    return false; // Not the creator, cannot delete
+  } else {
+    const stmt = db.prepare("DELETE FROM channels WHERE id = ?");
+    const result = stmt.run(channelId);
+    return result.changes > 0;
+  }
 };
