@@ -35,8 +35,9 @@ protectedRouter.post("/extends", extendSession);
 protectedRouter.post("/channel", createChannel); // Create a channel
 protectedRouter.get("/user/channel", getChannels); // List channels
 protectedRouter.delete("/channel/:channelId", deleteChannel); //Deletes a channel
-protectedRouter.put("/channel/:channel_id/user/:user_id", joinChannel); // Join a room
+protectedRouter.put("/channel/:channel_id/user/:user_id", joinChannel); // Invites to  a room
 protectedRouter.delete("/channel/:channel_id/user/:user_id", leaveChannel); // Leave a room
+
 // Messages Routes
 protectedRouter.post("/messages", sendMessage); // Post a message
 protectedRouter.get("/channel/:channelId/messages", getChannelMessages); // Read chat history
