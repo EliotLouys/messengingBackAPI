@@ -1,0 +1,489 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "My message API",
+    "description": "A minimal messenging API",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your token with the \"Bearer \" prefix, e.g. \"Bearer eyJ...\""
+    }
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Register a new user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User registration data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "john_doe"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "securePassword123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Login a user and return jwt token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User registration data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "john_doe"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "securePassword123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "jwt_token_here"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/extends": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Extend the validity of the current session (Sliding Window)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session extended successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Session extended"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "new_jwt_token_here"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/channels": {
+      "post": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Creates new channel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Channel metadata",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Channel_name_here"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Channel_description_here"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Get channels accessible to user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/channels/{channelId}/join": {
+      "post": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Join the specified channel",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Message metadata",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "channelId": {
+                  "type": "string",
+                  "example": "Channel_ID_Where_to_send"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/messages": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Send a message to the specified channel",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Message metadata",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "example": "Message_content"
+                },
+                "channelId": {
+                  "type": "string",
+                  "example": "Channel_ID_Where_to_send"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/channels/{channelId}/messages": {
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Get messages for specified channel",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Channel ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "channelId": {
+                  "type": "string",
+                  "example": "Channel_ID_Where_to_send"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "user/meta": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Retrieve the logged-in user\\'s profile information",
+        "responses": {
+          "200": {
+            "description": "User metadata found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "john_doe"
+                },
+                "display_name": {
+                  "type": "string",
+                  "example": "John D."
+                },
+                "img": {
+                  "type": "string",
+                  "example": "https://example.com/avatar.png"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "Online"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "description": "Update user profile details. Only sends fields you want to change.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Fields to update",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "display_name": {
+                  "type": "string",
+                  "example": "CoolUser"
+                },
+                "img": {
+                  "type": "string",
+                  "example": "https://example.com/avatar.png"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "Coding..."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Profile updated successfully"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "john_doe"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "CoolUser"
+                    },
+                    "img": {
+                      "type": "string",
+                      "example": "https://example.com/avatar.png"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "Coding..."
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}
