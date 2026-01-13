@@ -195,6 +195,9 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "409": {
             "description": "Conflict"
           },
@@ -222,6 +225,35 @@
                   "description": {
                     "type": "string",
                     "example": "Channel_description_here"
+                  },
+                  "img": {
+                    "type": "string",
+                    "exemple": "https://exemple.com"
+                  },
+                  "theme": {
+                    "type": "object",
+                    "properties": {
+                      "primary_color": {
+                        "type": "string",
+                        "example": "#E91E63"
+                      },
+                      "primary_color_dark": {
+                        "type": "string",
+                        "example": "#C2185B"
+                      },
+                      "accent_color": {
+                        "type": "string",
+                        "example": "#00BCD4"
+                      },
+                      "text_color": {
+                        "type": "string",
+                        "example": "#212121"
+                      },
+                      "accent_text_color": {
+                        "type": "string",
+                        "example": "#FFFFFF"
+                      }
+                    }
                   }
                 },
                 "required": [
@@ -379,6 +411,100 @@
             "bearerAuth": []
           }
         ]
+      }
+    },
+    "/protected/channel/{channelId}/update_metadata": {
+      "put": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Update channel metadata",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the channel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Channel metadata to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "New Channel Name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Updated description"
+                  },
+                  "img": {
+                    "type": "string",
+                    "example": "https://example.com/new-image.png"
+                  },
+                  "theme": {
+                    "type": "object",
+                    "properties": {
+                      "primary_color": {
+                        "type": "string",
+                        "example": "#E91E63"
+                      },
+                      "primary_color_dark": {
+                        "type": "string",
+                        "example": "#C2185B"
+                      },
+                      "accent_color": {
+                        "type": "string",
+                        "example": "#00BCD4"
+                      },
+                      "text_color": {
+                        "type": "string",
+                        "example": "#212121"
+                      },
+                      "accent_text_color": {
+                        "type": "string",
+                        "example": "#FFFFFF"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/protected/channel/{channelId}/messages": {

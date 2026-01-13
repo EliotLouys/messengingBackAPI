@@ -22,8 +22,10 @@ export const initDb = () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL,
             description TEXT,
-            type TEXT DEFAULT 'text', -- <--- YOU MUST ADD THIS COMMA
-            creator_id INTEGER NOT NULL,       -- <--- REMOVE THE COMMA HERE
+            img TEXT,
+            theme TEXT,
+            type TEXT DEFAULT 'text',
+            creator_id INTEGER NOT NULL,     
             FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE CASCADE
         )
     `

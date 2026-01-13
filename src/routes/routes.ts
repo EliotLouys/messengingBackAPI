@@ -14,6 +14,7 @@ import {
   joinChannel,
   deleteChannel,
   leaveChannel,
+  updateChannelMetadata,
 } from "../controllers/chatController";
 import { getMetadata, postUserMetadata } from "../controllers/userController";
 
@@ -52,6 +53,10 @@ router.get("/protected/user/channel", getChannels);
 router.delete("/protected/channel/:channelId", deleteChannel);
 router.put("/protected/channel/:channel_id/user/:user_id", joinChannel);
 router.delete("/protected/channel/:channel_id/user/:user_id", leaveChannel);
+router.put(
+  "/protected/channel/:channelId/update_metadata",
+  updateChannelMetadata
+);
 
 // Messages
 router.post("/protected/channel/:channelId/messages", sendMessage);

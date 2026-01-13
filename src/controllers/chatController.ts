@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as ChannelRepo from "../repositories/channelRepository";
 import * as MessageRepo from "../repositories/messageRepository";
 import * as MemberRepo from "../repositories/memberRepository";
+import { ChannelUpdateMetadata, validateTheme } from "../models/model";
 
 // --- Channels ---
 export const createChannel = (req: Request, res: Response) => {
@@ -23,7 +24,22 @@ export const createChannel = (req: Request, res: Response) => {
                     description: {
                         type: "string",
                         example: "Channel_description_here"
+                    },
+                    img: {
+                        type: "string",
+                        exemple: "https://exemple.com"
+                    },
+                    theme: {
+                        type: "object",
+                        properties: {
+                            primary_color: { type: "string", example: "#E91E63" },
+                            primary_color_dark: { type: "string", example: "#C2185B" },
+                            accent_color: { type: "string", example: "#00BCD4" },
+                            text_color: { type: "string", example: "#212121" },
+                            accent_text_color: { type: "string", example: "#FFFFFF" }
+                        }
                     }
+                    
                 },
                 required: ["name"]
             }
@@ -32,16 +48,26 @@ export const createChannel = (req: Request, res: Response) => {
 }
 */
 
-  const { name, description } = req.body;
+  const { name, description, img, theme } = req.body;
   const username = (req as any).user.username; // Get the creator's username
+
+  if (!validateTheme(theme)) {
+    return res.status(400).json({
+      error: "Invalid Theme Format",
+      message:
+        "Theme must contain primary_color, primary_color_dark, accent_color, text_color, and accent_text_color (all strings).",
+    });
+  }
 
   try {
     // 1. Create the channel
     const creatorId = (req as any).user.id;
-    console.log(name, description, creatorId);
+    // console.log(name, description, img, theme, creatorId);
     const channel = ChannelRepo.createChannel(
       name,
       description || "",
+      img,
+      theme,
       creatorId
     );
 
@@ -93,6 +119,89 @@ export const getChannels = (req: Request, res: Response) => {
   const userId = (req as any).user.id; // Get ID from token
   const myChannels = ChannelRepo.getChannelsByUser(userId);
   res.json(myChannels);
+};
+
+export const updateChannelMetadata = (req: Request, res: Response) => {
+  /* #swagger.tags = ['Channel']
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.description = "Update channel metadata"
+     #swagger.parameters['channelId'] = {
+        in: 'path',
+        description: 'The unique ID of the channel', 
+        required: true,
+        type: 'string'
+      }
+     #swagger.requestBody = {
+    description: "Channel metadata to update",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    name: { type: "string", example: "New Channel Name" },
+                    description: { type: "string", example: "Updated description" },
+                    img: { type: "string", example: "https://example.com/new-image.png" },
+                    theme: {
+                        type: "object",
+                        properties: {
+                            primary_color: { type: "string", example: "#E91E63" },
+                            primary_color_dark: { type: "string", example: "#C2185B" },
+                            accent_color: { type: "string", example: "#00BCD4" },
+                            text_color: { type: "string", example: "#212121" },
+                            accent_text_color: { type: "string", example: "#FFFFFF" }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+  */
+
+  const channelId = parseInt(req.params.channelId);
+  const userId = (req as any).user.id;
+  const { name, description, img, theme } = req.body;
+
+  // --- VALIDATION ---
+  if (theme && !validateTheme(theme)) {
+    return res.status(400).json({
+      error: "Invalid Theme Format",
+      message:
+        "Theme object is missing required color fields or contains invalid values.",
+    });
+  }
+
+  try {
+    const updateData: ChannelUpdateMetadata = {
+      name,
+      description,
+      img,
+      theme,
+    };
+
+    ChannelRepo.updateChannel(channelId, userId, updateData);
+
+    res.status(200).json({
+      message: "Channel updated successfully",
+      updatedFields: updateData,
+    });
+  } catch (err: any) {
+    if (err.message === "CHANNEL_NOT_FOUND") {
+      return res.status(404).json({ error: "Channel not found" });
+    }
+    if (err.message === "UNAUTHORIZED") {
+      return res
+        .status(403)
+        .json({ error: "Only the channel creator can update settings" });
+    }
+    if (err.message === "CHANNEL_NAME_TAKEN") {
+      return res.status(409).json({ error: "Channel name is already taken" });
+    }
+
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 export const sendMessage = (req: Request, res: Response) => {
