@@ -3,31 +3,42 @@ import db from "../db";
 export const createMessage = (
   userId: number,
   channelId: number,
-  content: string
+  content: string,
+  type: "Text" | "Image" = "Text" // Default to Text
 ) => {
   const stmt = db.prepare(
-    "INSERT INTO messages (user_id, channel_id, content) VALUES (?, ?, ?)"
+    "INSERT INTO messages (user_id, channel_id, content, type) VALUES (?, ?, ?, ?)"
   );
-  const result = stmt.run(userId, channelId, content);
+  const result = stmt.run(userId, channelId, content, type);
 
-  // Immediately fetch the created message to return it
-  return db
-    .prepare("SELECT * FROM messages WHERE id = ?")
-    .get(result.lastInsertRowid);
+  return {
+    id: result.lastInsertRowid,
+    user_id: userId,
+    channel_id: channelId,
+    content,
+    type, // Return the type
+    created_at: new Date().toISOString(),
+  };
 };
 
 export const getMessagesByChannel = (channelId: number) => {
-  // JOIN users so we know WHO sent the message
-  const stmt = db.prepare(`
+  // Select the new 'type' column as well
+  return db
+    .prepare(
+      `
         SELECT 
             messages.id, 
             messages.content, 
-            messages.created_at,
-            users.username
-        FROM messages 
-        JOIN users ON messages.user_id = users.id 
-        WHERE messages.channel_id = ? 
+            messages.type,  -- <--- Fetch type
+            messages.created_at, 
+            messages.user_id,
+            users.username as author_name,
+            users.img as author_avatar
+        FROM messages
+        JOIN users ON messages.user_id = users.id
+        WHERE channel_id = ?
         ORDER BY messages.created_at ASC
-    `);
-  return stmt.all(channelId);
+    `
+    )
+    .all(channelId);
 };

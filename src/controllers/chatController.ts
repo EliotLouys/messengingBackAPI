@@ -207,50 +207,53 @@ export const updateChannelMetadata = (req: Request, res: Response) => {
 export const sendMessage = (req: Request, res: Response) => {
   /* #swagger.tags = ['Message']
      #swagger.security = [{ "bearerAuth": [] }]
-     #swagger.description = "Send a message to the specified channel"
-     #swagger.parameters['channelId'] = {
-        in: 'path',
-        description: 'The unique ID of the channel to get the messages from', 
-        required: true,
-        type: 'string'
-      }
+     #swagger.description = "Send a text or image message"
      #swagger.requestBody = {
-    description: "Sends a new message",
-    required: true,
-    content: {
-        "application/json": {
-            schema: {
-                type: "object",
-                properties: {
-                    content: {
-                        type: "string",
-                        example: "Message content"
+        required: true,
+        content: {
+            "application/json": {
+                schema: {
+                    type: "object",
+                    properties: {
+                        content: { type: "string", example: "Hello world OR https://image.url" },
+                        type: { type: "string", example: "Text", enum: ["Text", "Image"] },
                     },
-                    type: {
-                        type: "string",
-                        example: "Message type"
-                    }
+                    required: ["content"]
                 }
             }
         }
     }
-}
   */
-  const { content, type } = req.body;
+
+  // 1. Extract 'type' from body (default to 'Text' if missing)
+  const { content, type = "Text" } = req.body;
   const channelId = parseInt(req.params.channelId);
   const userId = (req as any).user.id;
 
-  // --- SECURITY CHECK ---
+  // Validate type
+  if (type !== "Text" && type !== "Image") {
+    return res
+      .status(400)
+      .json({ error: "Invalid message type. Must be 'Text' or 'Image'." });
+  }
+
+  // Security Check
+
   const isAllowed = MemberRepo.isMember(userId, channelId);
   if (!isAllowed) {
     return res
       .status(403)
       .json({ error: "You are not a member of this channel" });
   }
-  // ----------------------
 
-  const msg = MessageRepo.createMessage(userId, channelId, content);
-  res.status(201).json(msg);
+  try {
+    // 2. Pass 'type' to the repository
+    const msg = MessageRepo.createMessage(userId, channelId, content, type);
+    res.status(201).json(msg);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to send message" });
+  }
 };
 
 export const getChannelMessages = (req: Request, res: Response) => {

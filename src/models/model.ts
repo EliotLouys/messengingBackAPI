@@ -70,3 +70,15 @@ export interface ChannelUpdateMetadata {
   img?: string;
   theme?: Theme; // Reusing the Theme interface from previous steps
 }
+
+export interface Message {
+  id: number;
+  content: string;
+  type: "Text" | "Image"; // Restricted string type
+  user_id: number;
+  channel_id: number;
+  created_at: string;
+  // Optional: joined fields if you fetch author info
+  author_name?: string;
+  author_avatar?: string;
+}

@@ -37,6 +37,7 @@ export const initDb = () => {
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             content TEXT NOT NULL,
+            type TEXT DEFAULT 'Text',
             user_id INTEGER NOT NULL,
             channel_id INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -45,7 +46,17 @@ export const initDb = () => {
         )
     `
   ).run();
+  const columns = db.pragma("table_info(messages)") as Array<{ name: string }>;
 
+  // Check if 'type' column exists
+  const hasTypeColumn = columns.some((col) => col.name === "type");
+
+  if (!hasTypeColumn) {
+    console.log("Migrating DB: Adding 'type' column to messages table...");
+    db.prepare(
+      "ALTER TABLE messages ADD COLUMN type TEXT DEFAULT 'Text'"
+    ).run();
+  }
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS channel_members (
