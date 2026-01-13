@@ -54,7 +54,7 @@ router.put("/protected/channel/:channel_id/user/:user_id", joinChannel);
 router.delete("/protected/channel/:channel_id/user/:user_id", leaveChannel);
 
 // Messages
-router.post("/protected/messages", sendMessage);
+router.post("/protected/channel/:channelId/messages", sendMessage);
 router.get("/protected/channel/:channelId/messages", getChannelMessages);
 
 // User

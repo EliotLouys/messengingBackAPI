@@ -23,7 +23,8 @@ export const initDb = () => {
             name TEXT UNIQUE NOT NULL,
             description TEXT,
             type TEXT DEFAULT 'text', -- <--- YOU MUST ADD THIS COMMA
-            creator_id INTEGER        -- <--- REMOVE THE COMMA HERE
+            creator_id INTEGER NOT NULL,       -- <--- REMOVE THE COMMA HERE
+            FOREIGN KEY (creator_id) REFERENCES users (id) ON DELETE CASCADE
         )
     `
   ).run();
@@ -38,7 +39,7 @@ export const initDb = () => {
             channel_id INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (channel_id) REFERENCES channels (id)
+            FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
         )
     `
   ).run();
@@ -52,7 +53,7 @@ export const initDb = () => {
         role TEXT DEFAULT 'member', -- 'admin' or 'member'
         PRIMARY KEY (user_id, channel_id), -- Prevents duplicates (user can't join twice)
         FOREIGN KEY (user_id) REFERENCES users (id),
-        FOREIGN KEY (channel_id) REFERENCES channels (id)
+        FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
     )
 `
   ).run();

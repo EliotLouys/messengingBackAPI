@@ -1,4 +1,5 @@
 import db from "../db";
+import { ChannelCreator } from "../models/model";
 
 export const createChannel = (
   name: string,
@@ -9,7 +10,7 @@ export const createChannel = (
     const stmt = db.prepare(
       "INSERT INTO channels (name, description, creator_id) VALUES (?, ?, ?)"
     );
-    const result = stmt.run(name, description);
+    const result = stmt.run(name, description, creatorId);
     return { id: result.lastInsertRowid, name, description };
   } catch (err: any) {
     if (err.code === "SQLITE_CONSTRAINT_UNIQUE")
@@ -37,13 +38,15 @@ export const getChannelsByUser = (userId: number) => {
 export const deleteChannel = (channelId: number, userId: number) => {
   const creator_id = db
     .prepare("SELECT creator_id FROM channels WHERE id = ?")
-    .get(channelId);
-  console.log(creator_id);
-  const isAllowed = userId === creator_id;
+    .get(channelId) as ChannelCreator;
+  console.log(creator_id.creator_id);
+  const isAllowed = userId === creator_id.creator_id;
 
   if (!isAllowed) {
     return false; // Not the creator, cannot delete
   } else {
+    console.log("ran the query");
+
     const stmt = db.prepare("DELETE FROM channels WHERE id = ?");
     const result = stmt.run(channelId);
     return result.changes > 0;

@@ -129,15 +129,6 @@
           "Auth"
         ],
         "description": "Extend the validity of the current session (Sliding Window)",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Session extended successfully",
@@ -189,7 +180,7 @@
         },
         "security": [
           {
-            "ignore": true
+            "bearerAuth": []
           }
         ]
       }
@@ -316,8 +307,16 @@
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "description": "The unique ID of the user"
+            }
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of the user we want to add",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -355,8 +354,16 @@
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "description": "The unique ID of the user"
+            }
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of the user we want to add",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -374,12 +381,23 @@
         ]
       }
     },
-    "/protected/messages": {
+    "/protected/channel/{channelId}/messages": {
       "post": {
         "tags": [
           "Message"
         ],
         "description": "Send a message to the specified channel",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the channel to get the messages from"
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -414,9 +432,7 @@
             }
           }
         }
-      }
-    },
-    "/protected/channel/{channelId}/messages": {
+      },
       "get": {
         "tags": [
           "Message"

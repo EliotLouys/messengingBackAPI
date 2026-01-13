@@ -38,6 +38,7 @@ export const createChannel = (req: Request, res: Response) => {
   try {
     // 1. Create the channel
     const creatorId = (req as any).user.id;
+    console.log(name, description, creatorId);
     const channel = ChannelRepo.createChannel(
       name,
       description || "",
@@ -47,7 +48,7 @@ export const createChannel = (req: Request, res: Response) => {
     // 2. Automatically add the creator as a member
     console.log(username, channel.id, creatorId);
     MemberRepo.addMember(username, channel.id, creatorId);
-
+    console.log("Came through");
     res.status(201).json(channel);
   } catch (err: any) {
     if (err.message === "CHANNEL_EXISTS")
@@ -66,7 +67,9 @@ export const deleteChannel = (req: Request, res: Response) => {
   try {
     const channelId = parseInt(req.params.channelId);
     const userId = (req as any).user.id;
+
     const success = ChannelRepo.deleteChannel(channelId, userId);
+    console.log(channelId, userId, success);
     if (success) {
       res.json({ message: "Channel deleted successfully" });
     } else {
@@ -96,6 +99,12 @@ export const sendMessage = (req: Request, res: Response) => {
   /* #swagger.tags = ['Message']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Send a message to the specified channel"
+     #swagger.parameters['channelId'] = {
+        in: 'path',
+        description: 'The unique ID of the channel to get the messages from', 
+        required: true,
+        type: 'string'
+      }
      #swagger.requestBody = {
     description: "Sends a new message",
     required: true,
@@ -118,7 +127,8 @@ export const sendMessage = (req: Request, res: Response) => {
     }
 }
   */
-  const { content, channelId } = req.body;
+  const { content, type } = req.body;
+  const channelId = parseInt(req.params.channelId);
   const userId = (req as any).user.id;
 
   // --- SECURITY CHECK ---
@@ -163,9 +173,9 @@ export const joinChannel = (req: Request, res: Response) => {
   /* #swagger.tags = ['Channel']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Join the specified channel"
-     #swagger.parameters['user_id'] = {
+     #swagger.parameters['username'] = {
         in: 'path',
-        description: 'The unique ID of the user',
+        description: 'The username of the user we want to add',
         required: true,
         type: 'string'
      }
@@ -193,9 +203,9 @@ export const leaveChannel = (req: Request, res: Response) => {
   /* #swagger.tags = ['Channel']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Leave the specified channel"
-     #swagger.parameters['user_id'] = {
+     #swagger.parameters['username'] = {
         in: 'path',
-        description: 'The unique ID of the user',
+        description: 'The username of the user we want to add',
         required: true,
         type: 'string'
      }

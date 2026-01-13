@@ -19,6 +19,6 @@ if (require.main === module) {
   app.listen(PORT, HOST, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Local:   http://localhost:${PORT}`);
-    console.log(`Network: http://<YOUR_IP_ADDRESS>:${PORT}`);
+    console.log(`Network: http://192.168.1.155:${PORT}`);
   });
 }

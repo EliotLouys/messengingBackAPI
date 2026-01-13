@@ -8,11 +8,12 @@ export const addMember = (
   channelId: number | bigint,
   requestSenderId: number
 ) => {
+  console.log("here");
+
   try {
     const user = findUserByUsername(username);
     if (!user) return;
     const userId = user.id;
-
     const channel = db
       .prepare("SELECT creator_id FROM channels WHERE id = ?")
       .get(channelId) as ChannelCreator | undefined;

@@ -78,6 +78,7 @@ export const login = async (req: Request, res: Response) => {
       }
     }
   */
+  console.log("/POST login");
   const { username, password } = req.body;
 
   // Call the Repository
@@ -106,6 +107,11 @@ export const defaultPage = (req: Request, res: Response) => {
 
 export const extendSession = (req: Request, res: Response) => {
   /* #swagger.tags = ['Auth']
+  // 1. Force the padlock (Security Scheme) to appear
+     #swagger.security = [{ "bearerAuth": [] }]
+
+     // 2. Hide the auto-generated "authorization" parameter
+    #swagger.autoHeaders = false
     #swagger.description = 'Extend the validity of the current session (Sliding Window)'
     
     #swagger.responses[200] = {
