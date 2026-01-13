@@ -39,15 +39,31 @@ export const postUserMetadata = (req: Request, res: Response) => {
   /* #swagger.tags = ['User']
     #swagger.description = 'Update user profile details. Only sends fields you want to change.'
     #swagger.security = [{ "bearerAuth": [] }]
-    #swagger.parameters['body'] = {
-        in: 'body',
-        description: 'Fields to update',
-        schema: {
-            display_name: "CoolUser",
-            img: "https://example.com/avatar.png",
-            status: "Coding..."
+      #swagger.requestBody = {
+    description: "Posts user metadata",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    display_name: {
+                        type: "string",
+                        example: "e.louys"
+                    },
+                    img: {
+                        type: "string",
+                        example: "https://example.com/avatar.png"
+                    },
+                    status: {
+                        type: "string",
+                        example: "Coding.."
+                    }
+                }
+            }
         }
     }
+}
     #swagger.responses[200] = { 
       description: 'Profile updated successfully',
       schema: {

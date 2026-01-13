@@ -15,8 +15,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 initDb();
 
 // Listen on 0.0.0.0 to expose to the network
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Local:   http://localhost:${PORT}`);
-  console.log(`Network: http://<YOUR_IP_ADDRESS>:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Local:   http://localhost:${PORT}`);
+    console.log(`Network: http://<YOUR_IP_ADDRESS>:${PORT}`);
+  });
+}

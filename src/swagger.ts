@@ -6,18 +6,21 @@ const doc = {
     description: "A minimal messenging API",
   },
   host: "localhost:3000",
-  schemes: ["http"],
-  // This section is for the JWT Auth configuration in Swagger
-  securityDefinitions: {
-    bearerAuth: {
-      type: "apiKey",
-      name: "Authorization",
-      in: "header",
-      description:
-        'Enter your token with the "Bearer " prefix, e.g. "Bearer eyJ..."',
+  // 1. Switch to OpenAPI 3.0 to support correct Bearer auth
+  openapi: "3.0.0",
+
+  // 2. Define the Security Scheme properly for JWT
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT", // Tells Swagger it's a JWT
+      },
     },
   },
-  // Apply this security globally (optional, but good for your protected API)
+
+  // 3. Apply security globally (we will disable it for login/register specifically)
   security: [
     {
       bearerAuth: [],
@@ -26,9 +29,6 @@ const doc = {
 };
 
 const outputFile = "./swagger-output.json";
-const routes = ["./src/routes/routes.ts"]; // <--- Point to your main routes file
+const routes = ["./src/routes/routes.ts"];
 
-/* NOTE: If you are using 'ts-node', you need to run this script 
-   before starting the app, or use the generated JSON file. */
-
-swaggerAutogen()(outputFile, routes, doc);
+swaggerAutogen({ openapi: "3.0.0" })(outputFile, routes, doc);

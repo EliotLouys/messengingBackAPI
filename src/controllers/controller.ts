@@ -7,14 +7,27 @@ const SECRET_KEY = process.env.JWT_SECRET || "secret";
 export const register = async (req: Request, res: Response) => {
   /* #swagger.tags = ['Auth']
     #swagger.description = 'Register a new user'
-    #swagger.parameters['body'] = {
-        in: 'body',
-        description: 'User registration data',
-        schema: {
-            username: "john_doe",
-            password: "securePassword123"
+     #swagger.requestBody = {
+    description: "New user metadata",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    username: {
+                        type: "string",
+                        example: "username"
+                    },
+                    password: {
+                        type: "string",
+                        example: "password type"
+                    }
+                }
+            }
         }
-    } 
+    }
+}
   */
   const { username, password } = req.body;
 
@@ -37,14 +50,27 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   /* #swagger.tags = ['Auth']
     #swagger.description = 'Login a user and return jwt token'
-    #swagger.parameters['body'] = {
-        in: 'body',
-        description: 'User registration data',
-        schema: {
-            username: "john_doe",
-            password: "securePassword123"
+    #swagger.requestBody = {
+    description: "User metadata",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    username: {
+                        type: "string",
+                        example: "username"
+                    },
+                    password: {
+                        type: "string",
+                        example: "password type"
+                    }
+                }
+            }
         }
-    } 
+    }
+}
     #swagger.responses[200]={
       description: 'Login successful',
       schema: {
@@ -81,7 +107,7 @@ export const defaultPage = (req: Request, res: Response) => {
 export const extendSession = (req: Request, res: Response) => {
   /* #swagger.tags = ['Auth']
     #swagger.description = 'Extend the validity of the current session (Sliding Window)'
-    #swagger.security = [{ "bearerAuth": [] }]
+    
     #swagger.responses[200] = {
       description: 'Session extended successfully',
       schema: {

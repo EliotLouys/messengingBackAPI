@@ -6,17 +6,31 @@ import * as MemberRepo from "../repositories/memberRepository";
 // --- Channels ---
 export const createChannel = (req: Request, res: Response) => {
   /* #swagger.tags = ['Channel']
-     #swagger.security = [{ "bearerAuth": [] }]
-     #swagger.description = "Creates new channel"
-     #swagger.parameters["body"]={
-      in:"body",
-      description:"Channel metadata",
-      schema:{
-        name:"Channel_name_here",
-        description:"Channel_description_here"
-      }
-     }
-  */
+    #swagger.security = [{ "bearerAuth": [] }]
+    #swagger.description = "Creates new channel"
+    #swagger.requestBody = {
+    description: "Create a new channel",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        example: "Channel_name_here"
+                    },
+                    description: {
+                        type: "string",
+                        example: "Channel_description_here"
+                    }
+                },
+                required: ["name"]
+            }
+        }
+    }
+}
+*/
 
   const { name, description } = req.body;
   const username = (req as any).user.username; // Get the creator's username
@@ -31,7 +45,8 @@ export const createChannel = (req: Request, res: Response) => {
     );
 
     // 2. Automatically add the creator as a member
-    MemberRepo.addMember(username, channel.id);
+    console.log(username, channel.id, creatorId);
+    MemberRepo.addMember(username, channel.id, creatorId);
 
     res.status(201).json(channel);
   } catch (err: any) {
@@ -81,14 +96,27 @@ export const sendMessage = (req: Request, res: Response) => {
   /* #swagger.tags = ['Message']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Send a message to the specified channel"
-     #swagger.parameters["body"]={
-      in:"body",
-      description:"Message metadata",
-      schema:{
-        content:"Message_content",
-        channelId:"Channel_ID_Where_to_send"
-      }
+     #swagger.requestBody = {
+    description: "Sends a new message",
+    required: true,
+    content: {
+        "application/json": {
+            schema: {
+                type: "object",
+                properties: {
+                    content: {
+                        type: "string",
+                        example: "Message content"
+                    },
+                    type: {
+                        type: "string",
+                        example: "Message type"
+                    }
+                }
+            }
+        }
     }
+}
   */
   const { content, channelId } = req.body;
   const userId = (req as any).user.id;
@@ -110,13 +138,12 @@ export const getChannelMessages = (req: Request, res: Response) => {
   /* #swagger.tags = ['Message']
      #swagger.security = [{ "bearerAuth": [] }]
      #swagger.description = "Get messages for specified channel"
-     #swagger.parameters["body"]={
-      in:"body",
-      description:"Channel ID",
-      schema:{
-        channelId:"Channel_ID_Where_to_send",
+     #swagger.parameters['channelId'] = {
+        in: 'path',
+        description: 'The unique ID of the channel to get the messages from', 
+        required: true,
+        type: 'string'
       }
-    }
   */
   const channelId = parseInt(req.params.channelId);
   const userId = (req as any).user.id;

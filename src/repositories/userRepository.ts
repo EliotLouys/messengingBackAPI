@@ -1,15 +1,19 @@
 import db from "../db";
 import bcrypt from "bcrypt";
-import { UserMetaData } from "../models/model";
+import { UserMetaData, User } from "../models/model";
 
 // 2. Define the functions your controller needs
-export const findUserByUsername = (username: string) => {
+export const findUserByUsername = (username: string): User | undefined => {
   // .get() returns the first match or undefined
-  return db.prepare("SELECT * FROM users WHERE username = ?").get(username);
+  return db.prepare("SELECT * FROM users WHERE username = ?").get(username) as
+    | User
+    | undefined;
 };
 
-export const findUserById = (id: number) => {
-  return db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+export const findUserById = (id: number): User | undefined => {
+  return db.prepare("SELECT * FROM users WHERE id = ?").get(id) as
+    | User
+    | undefined;
 };
 
 export const createUser = async (username: string, plainPassword: string) => {

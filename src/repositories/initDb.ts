@@ -22,8 +22,8 @@ export const initDb = () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL,
             description TEXT,
-            type TEXT DEFAULT 'text' -- 'text' or 'voice'
-            creator_id INTEGER,
+            type TEXT DEFAULT 'text', -- <--- YOU MUST ADD THIS COMMA
+            creator_id INTEGER        -- <--- REMOVE THE COMMA HERE
         )
     `
   ).run();

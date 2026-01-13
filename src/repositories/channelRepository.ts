@@ -35,10 +35,12 @@ export const getChannelsByUser = (userId: number) => {
 };
 
 export const deleteChannel = (channelId: number, userId: number) => {
-  const isAllowed =
-    userId ===
-    db.prepare("SELECT creator_id FROM channels WHERE id = ?").get(channelId)
-      ?.creator_id;
+  const creator_id = db
+    .prepare("SELECT creator_id FROM channels WHERE id = ?")
+    .get(channelId);
+  console.log(creator_id);
+  const isAllowed = userId === creator_id;
+
   if (!isAllowed) {
     return false; // Not the creator, cannot delete
   } else {

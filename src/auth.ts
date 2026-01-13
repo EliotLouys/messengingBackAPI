@@ -11,6 +11,7 @@ export const authMiddleware = (
 ) => {
   // 1. Get the token from the header (Authorization: Bearer <token>)
   const authHeader = req.headers.authorization;
+  console.log(authHeader);
   const token = authHeader && authHeader.split(" ")[1]; // Get the part after "Bearer"
 
   if (!token) {

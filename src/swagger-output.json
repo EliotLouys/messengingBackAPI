@@ -1,23 +1,15 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "My message API",
     "description": "A minimal messenging API",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
-  "basePath": "/",
-  "schemes": [
-    "http"
-  ],
-  "securityDefinitions": {
-    "bearerAuth": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header",
-      "description": "Enter your token with the \"Bearer \" prefix, e.g. \"Bearer eyJ...\""
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
     }
-  },
+  ],
   "paths": {
     "/register": {
       "post": {
@@ -25,26 +17,6 @@
           "Auth"
         ],
         "description": "Register a new user",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "User registration data",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "type": "string",
-                  "example": "john_doe"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "securePassword123"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -58,6 +30,28 @@
           "500": {
             "description": "Internal Server Error"
           }
+        },
+        "security": [],
+        "requestBody": {
+          "description": "New user metadata",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password type"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -67,49 +61,69 @@
           "Auth"
         ],
         "description": "Login a user and return jwt token",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "User registration data",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "type": "string",
-                  "example": "john_doe"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "securePassword123"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Login successful",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "type": "string",
-                  "example": "jwt_token_here"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "jwt_token_here"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
                 }
               },
-              "xml": {
-                "name": "main"
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "jwt_token_here"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
               }
             }
           },
           "401": {
             "description": "Unauthorized"
           }
+        },
+        "security": [],
+        "requestBody": {
+          "description": "User metadata",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password type"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/extends": {
+    "/protected/extends": {
       "post": {
         "tags": [
           "Auth"
@@ -119,26 +133,50 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Session extended successfully",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "example": "Session extended"
-                },
-                "token": {
-                  "type": "string",
-                  "example": "new_jwt_token_here"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Session extended"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "new_jwt_token_here"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
                 }
               },
-              "xml": {
-                "name": "main"
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Session extended"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "new_jwt_token_here"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
               }
             }
           },
@@ -151,37 +189,17 @@
         },
         "security": [
           {
-            "bearerAuth": []
+            "ignore": true
           }
         ]
       }
     },
-    "/channels": {
+    "/protected/channel": {
       "post": {
         "tags": [
           "Channel"
         ],
         "description": "Creates new channel",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Channel metadata",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Channel_name_here"
-                },
-                "description": {
-                  "type": "string",
-                  "example": "Channel_description_here"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -197,8 +215,34 @@
           {
             "bearerAuth": []
           }
-        ]
-      },
+        ],
+        "requestBody": {
+          "description": "Create a new channel",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Channel_name_here"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Channel_description_here"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected/user/channel": {
       "get": {
         "tags": [
           "Channel"
@@ -216,32 +260,103 @@
         ]
       }
     },
-    "/channels/{channelId}/join": {
-      "post": {
+    "/protected/channel/{channelId}": {
+      "delete": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Delete a channel by ID",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/protected/channel/{channel_id}/user/{user_id}": {
+      "put": {
         "tags": [
           "Channel"
         ],
         "description": "Join the specified channel",
         "parameters": [
           {
-            "name": "channelId",
+            "name": "channel_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the channel to join"
           },
           {
-            "name": "body",
-            "in": "body",
-            "description": "Message metadata",
+            "name": "user_id",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "channelId": {
-                  "type": "string",
-                  "example": "Channel_ID_Where_to_send"
-                }
-              }
-            }
+              "type": "string"
+            },
+            "description": "The unique ID of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Channel"
+        ],
+        "description": "Leave the specified channel",
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the channel to join"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of the user"
           }
         ],
         "responses": {
@@ -259,32 +374,12 @@
         ]
       }
     },
-    "/messages": {
+    "/protected/messages": {
       "post": {
         "tags": [
           "Message"
         ],
         "description": "Send a message to the specified channel",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Message metadata",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "content": {
-                  "type": "string",
-                  "example": "Message_content"
-                },
-                "channelId": {
-                  "type": "string",
-                  "example": "Channel_ID_Where_to_send"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -297,10 +392,31 @@
           {
             "bearerAuth": []
           }
-        ]
+        ],
+        "requestBody": {
+          "description": "Sends a new message",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "Message content"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "Message type"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/channels/{channelId}/messages": {
+    "/protected/channel/{channelId}/messages": {
       "get": {
         "tags": [
           "Message"
@@ -311,21 +427,10 @@
             "name": "channelId",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Channel ID",
             "schema": {
-              "type": "object",
-              "properties": {
-                "channelId": {
-                  "type": "string",
-                  "example": "Channel_ID_Where_to_send"
-                }
-              }
-            }
+              "type": "string"
+            },
+            "description": "The unique ID of the channel to get the messages from"
           }
         ],
         "responses": {
@@ -343,7 +448,7 @@
         ]
       }
     },
-    "user/meta": {
+    "/protected/user/meta": {
       "get": {
         "tags": [
           "User"
@@ -352,28 +457,58 @@
         "responses": {
           "200": {
             "description": "User metadata found",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "type": "string",
-                  "example": "john_doe"
-                },
-                "display_name": {
-                  "type": "string",
-                  "example": "John D."
-                },
-                "img": {
-                  "type": "string",
-                  "example": "https://example.com/avatar.png"
-                },
-                "status": {
-                  "type": "string",
-                  "example": "Online"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "john_doe"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "John D."
+                    },
+                    "img": {
+                      "type": "string",
+                      "example": "https://example.com/avatar.png"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "Online"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
                 }
               },
-              "xml": {
-                "name": "main"
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "john_doe"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "John D."
+                    },
+                    "img": {
+                      "type": "string",
+                      "example": "https://example.com/avatar.png"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "Online"
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
               }
             }
           },
@@ -395,64 +530,79 @@
           "User"
         ],
         "description": "Update user profile details. Only sends fields you want to change.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Fields to update",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "display_name": {
-                  "type": "string",
-                  "example": "CoolUser"
-                },
-                "img": {
-                  "type": "string",
-                  "example": "https://example.com/avatar.png"
-                },
-                "status": {
-                  "type": "string",
-                  "example": "Coding..."
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Profile updated successfully",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "example": "Profile updated successfully"
-                },
-                "data": {
+            "content": {
+              "application/json": {
+                "schema": {
                   "type": "object",
                   "properties": {
-                    "username": {
+                    "message": {
                       "type": "string",
-                      "example": "john_doe"
+                      "example": "Profile updated successfully"
                     },
-                    "display_name": {
-                      "type": "string",
-                      "example": "CoolUser"
-                    },
-                    "img": {
-                      "type": "string",
-                      "example": "https://example.com/avatar.png"
-                    },
-                    "status": {
-                      "type": "string",
-                      "example": "Coding..."
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "john_doe"
+                        },
+                        "display_name": {
+                          "type": "string",
+                          "example": "CoolUser"
+                        },
+                        "img": {
+                          "type": "string",
+                          "example": "https://example.com/avatar.png"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "Coding..."
+                        }
+                      }
                     }
+                  },
+                  "xml": {
+                    "name": "main"
                   }
                 }
               },
-              "xml": {
-                "name": "main"
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Profile updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "john_doe"
+                        },
+                        "display_name": {
+                          "type": "string",
+                          "example": "CoolUser"
+                        },
+                        "img": {
+                          "type": "string",
+                          "example": "https://example.com/avatar.png"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "Coding..."
+                        }
+                      }
+                    }
+                  },
+                  "xml": {
+                    "name": "main"
+                  }
+                }
               }
             }
           },
@@ -467,10 +617,35 @@
           {
             "bearerAuth": []
           }
-        ]
+        ],
+        "requestBody": {
+          "description": "Posts user metadata",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "display_name": {
+                    "type": "string",
+                    "example": "e.louys"
+                  },
+                  "img": {
+                    "type": "string",
+                    "example": "https://example.com/avatar.png"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "Coding.."
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/": {
+    "/protected/": {
       "get": {
         "description": "",
         "responses": {
@@ -478,6 +653,15 @@
             "description": "OK"
           }
         }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   },

@@ -1,4 +1,5 @@
 import db from "../db";
+import { ChannelCreator } from "../models/model";
 import { findUserByUsername } from "./userRepository";
 
 // Add user to channel
@@ -8,11 +9,16 @@ export const addMember = (
   requestSenderId: number
 ) => {
   try {
-    const userId = findUserByUsername(username).id;
-    const isAllowed =
-      requestSenderId ===
-      db.prepare("SELECT creator_id FROM channels WHERE id = ?").get(channelId)
-        ?.creator_id;
+    const user = findUserByUsername(username);
+    if (!user) return;
+    const userId = user.id;
+
+    const channel = db
+      .prepare("SELECT creator_id FROM channels WHERE id = ?")
+      .get(channelId) as ChannelCreator | undefined;
+
+    const isAllowed = requestSenderId === channel?.creator_id;
+
     if (!isAllowed) {
       return false; // Not the creator, cannot delete
     } else {
@@ -47,7 +53,7 @@ export const removeMember = (
   // We explicitly cast the result to ensure TypeScript knows what to expect
   const channel = db
     .prepare("SELECT creator_id FROM channels WHERE id = ?")
-    .get(channelId) as { creator_id: number } | undefined;
+    .get(channelId) as ChannelCreator | undefined;
 
   // If channel doesn't exist, return false
   if (!channel) {

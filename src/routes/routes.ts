@@ -16,39 +16,53 @@ import {
   leaveChannel,
 } from "../controllers/chatController";
 import { getMetadata, postUserMetadata } from "../controllers/userController";
+
 const router = Router();
 
-// Public Route (Anyone can log in)
-router.post("/register", register);
-router.post("/login", login);
+// ==========================================
+// PUBLIC ROUTES
+// ==========================================
+router.post(
+  "/register",
+  // #swagger.security = []
+  register
+);
 
-// Protected Routes Group
-// 1. We create a sub-router
-const protectedRouter = Router();
+router.post(
+  "/login",
+  // #swagger.security = []
+  login
+);
+// ==========================================
+// PROTECTED ROUTES MIDDLEWARE
+// ==========================================
+// This applies authMiddleware to any request starting with /protected
+router.use("/protected", authMiddleware);
 
-// 2. We apply the middleware to this sub-router
-protectedRouter.use(authMiddleware);
+// ==========================================
+// PROTECTED ROUTES (Explicit Paths)
+// ==========================================
 
-protectedRouter.post("/extends", extendSession);
+// Session
+router.post("/protected/extends", extendSession);
 
-// Channels Routes
-protectedRouter.post("/channel", createChannel); // Create a channel
-protectedRouter.get("/user/channel", getChannels); // List channels
-protectedRouter.delete("/channel/:channelId", deleteChannel); //Deletes a channel
-protectedRouter.put("/channel/:channel_id/user/:user_id", joinChannel); // Invites to  a room
-protectedRouter.delete("/channel/:channel_id/user/:user_id", leaveChannel); // Leave a room
+// Channels
+router.post("/protected/channel", createChannel);
+router.get("/protected/user/channel", getChannels);
+router.delete("/protected/channel/:channelId", deleteChannel);
+router.put("/protected/channel/:channel_id/user/:user_id", joinChannel);
+router.delete("/protected/channel/:channel_id/user/:user_id", leaveChannel);
 
-// Messages Routes
-protectedRouter.post("/messages", sendMessage); // Post a message
-protectedRouter.get("/channel/:channelId/messages", getChannelMessages); // Read chat history
+// Messages
+router.post("/protected/messages", sendMessage);
+router.get("/protected/channel/:channelId/messages", getChannelMessages);
 
-// User Routes
-protectedRouter.get("user/meta", getMetadata);
-protectedRouter.post("user/meta", postUserMetadata);
+// User
+// Note: Fixed the missing slash from your original code here as well
+router.get("/protected/user/meta", getMetadata);
+router.post("/protected/user/meta", postUserMetadata);
 
-// 3. We define the routes inside
-protectedRouter.get("/", defaultPage);
+// Default
+router.get("/protected/", defaultPage);
 
-// 4. We mount the sub-router under '/protected'
-router.use("/protected", protectedRouter);
 export default router;
